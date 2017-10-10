@@ -276,7 +276,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         currency="USD"
         basic-card='["visa", "mastercard", "amex", "discover", "diners", "jcb", "unionpay"]'
         supported-methods='["https://emerald-eon.appspot.com/alicepay","https://emerald-eon.appspot.com/bobpay"]'
-        pay-with-google='{"merchantId":"02510116604241796260","environment":"TEST","apiVersion":1,"allowedPaymentMethods":["CARD","TOKENIZED_CARD"],"paymentMethodTokenizationParameters": { "tokenizationType":"DIRECT", "parameters": {"publicKey": "BOdoXP1aiNpkh3JUhiSZKHYF2Y="}},"cardRequirements":{ "allowedCardNetworks":["AMEX","DISCOVER","MASTERCARD","VISA"], "billingAddressRequired":true,"billingAddressFormat":"FULL"}, "phoneNumberRequired":false,"emailRequired":false, "shippingAddressRequired":false}'
+        pay-with-google='{"merchantId":"02510116604241796260","environment":"TEST","apiVersion":1,"allowedPaymentMethods":["CARD","TOKENIZED_CARD"],"paymentMethodTokenizationParameters": { "tokenizationType":"PAYMENT_GATEWAY", "parameters": {"gateway":"stripe","stripe:publishableKey":"pk_test_fkdoiK6FR5BLZMFNbSGoDjpn","stripe:version":"5.1.0"}},"cardRequirements":{ "allowedCardNetworks":["AMEX","DISCOVER","MASTERCARD","VISA"], "billingAddressRequired":true,"billingAddressFormat":"FULL"}, "phoneNumberRequired":false,"emailRequired":false, "shippingAddressRequired":false}'
         request-payer-email
         request-payer-phone
         request-payer-name
