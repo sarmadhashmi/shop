@@ -445,6 +445,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.addEventListener('show-snackbar', (e)=>this._showSnackbar(e));
         this.addEventListener('buy-item', (e)=>this._onBuyItem(e));
         this.addEventListener('buy-cart', (e)=>this._onBuyCart(e));
+        this.addEventListener('process-payment', (e) => {
+          this._processPayment(e.detail.paymentResponse, e.detail.cartBuy)
+        });
         this.addEventListener('logout', (e)=>this._onLogout(e));
         // listen for online/offline
         Polymer.RenderStatus.afterNextRender(this, () => {
@@ -567,6 +570,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             // Reset the list view scrollTop if the category changed.
             this._listScrollTop = 0;
           }
+        } else if (this.page === 'checkout') {
+          scrollTop = 0;
         }
         // Use `Polymer.AppLayout.scroll` with `behavior: 'silent'` to disable header scroll
         // effects during the scroll.
@@ -640,27 +645,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _onBuyCart(event) {
-        if ('PaymentRequest' in window) {
-          let itemDetails = this.payment._computeItemDetails();
-          let total = itemDetails.reduce((sum,item) => {
-            return sum + parseFloat(item.amount.value);
-          }, 0);
-          this.payment.buyItems(itemDetails, total)
-          .then(instrument => {
-            return this._processPayment(instrument, true);
-          }).catch(err => {
-            if (err.name === 'AbortError') {
-              // Do nothing
-            } else if (err.name === 'NotSupportedError') {
-              this._redirectToCheckout();
-            } else {
-              console.error(`Error while handling PaymentRequest.show(): ${err}`);
-            }
-          });
-        } else {
+        // if ('PaymentRequest' in window) {
+        //   let itemDetails = this.payment._computeItemDetails();
+        //   let total = itemDetails.reduce((sum,item) => {
+        //     return sum + parseFloat(item.amount.value);
+        //   }, 0);
+        //   this.payment.buyItems(itemDetails, total)
+        //   .then(instrument => {
+        //     return this._processPayment(instrument, true);
+        //   }).catch(err => {
+        //     if (err.name === 'AbortError') {
+        //       // Do nothing
+        //     } else if (err.name === 'NotSupportedError') {
+        //       this._redirectToCheckout();
+        //     } else {
+        //       console.error(`Error while handling PaymentRequest.show(): ${err}`);
+        //     }
+        //   });
+        // } else {
           this._redirectToCheckout();
           return;
-        }
+        // }
       }
 
       _redirectToCheckout() {
@@ -680,26 +685,26 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         // https://developers.google.com/web/fundamentals/primers/payment-request/
 
         window.setTimeout(() => {
-          instrumentResponse.complete('success')
-          .then(() => {
-            // Proceed to sign-in if the user is not signed up
-            if (!this.accountData.isSignedIn()) {
-              this.userEmail = instrumentResponse.payerEmail;
-              this.set('route.path', '/account/signup');
-            } else {
-              if (!this._orderSuccessModal) {
-                this._orderSuccessModal = document.createElement('shop-order-success-modal');
-                this.root.appendChild(this._orderSuccessModal);
-              }
-              this._orderSuccessModal.open();
-              this._announce('Order processed successfully!');
+          if (instrumentResponse.complete) {
+            instrumentResponse.complete('success')
+          }
+          // Proceed to sign-in if the user is not signed up
+          if (!this.accountData.isSignedIn()) {
+            this.userEmail = instrumentResponse.payerEmail;
+            this.set('route.path', '/account/signup');
+          } else {
+            if (!this._orderSuccessModal) {
+              this._orderSuccessModal = document.createElement('shop-order-success-modal');
+              this.root.appendChild(this._orderSuccessModal);
             }
-            if (cartBuy) {
-              this.dispatchEvent(new CustomEvent('clear-cart', {
-                bubbles: true, composed: true
-              }));
-            }
-          });
+            this._orderSuccessModal.open();
+            this._announce('Order processed successfully!');
+          }
+          if (cartBuy) {
+            this.dispatchEvent(new CustomEvent('clear-cart', {
+              bubbles: true, composed: true
+            }));
+          }
         }, 2000);
       }
 
