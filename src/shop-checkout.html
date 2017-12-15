@@ -104,6 +104,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       .pay-with-google > img {
+        cursor: pointer;
         max-width: 200px;
         @apply --layout-center-justified;
       }
@@ -447,7 +448,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <div class="flex">Total</div>
               <div>[[_formatPrice(total)]]</div>
             </div>
-            <div class="pay-with-google proceed-box" on-tap="_buyGoogle">
+            <div class="pay-with-google proceed-box" on-tap="_googlePaySubmit">
               <image src="/images/pay_with_google.png" />
             </div>
           </section>
@@ -695,37 +696,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _googlePaySubmit(e) {
-        this.dispatchEvent(new CustomEvent('process-payment', {
-          bubbles: true, composed: true, detail: {
-            paymentResponse: paymentResponse,
-            cartBuy: true
-          }
+        this.dispatchEvent(new CustomEvent('payment-request', {
+          bubbles: true, composed: true
         }));
       }
-
-      // _submit(e) {
-      //   if (this._validateForm()) {
-      //     // To send the form data to the server:
-      //     // 2) Remove the code below.
-      //     // 3) Uncomment `this.$.addressForm.submit()`.
-
-      //     this.$.addressForm.dispatchEvent(new CustomEvent('iron-form-presubmit', {
-      //       composed: true}));
-
-      //     this._submitFormDebouncer = Polymer.Debouncer.debounce(this._submitFormDebouncer,
-      //       Polymer.Async.timeOut.after(1000), () => {
-      //         this.$.addressForm.dispatchEvent(new CustomEvent('iron-form-response', {
-      //           composed: true, detail: {
-      //             response: {
-      //               success: 1,
-      //               successMessage: 'Demo checkout process complete.'
-      //             }
-      //           }}));
-      //       });
-
-      //     // this.$.addressForm.submit();
-      //   }
-      // }
 
       /**
        * Sets the valid state and updates the location.

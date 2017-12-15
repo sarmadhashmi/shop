@@ -83,31 +83,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         };
 
         // Collect a shipping address, and honor client's other options.
-        let options = {
-          requestShipping:    true,
-          requestPayerEmail:  this.requestPayerEmail,
-          requestPayerPhone:  this.requestPayerPhone,
-          requestPayerName:   this.requestPayerName,
-          shippingType:       this.shippingType
-        };
+        let options = {};
 
-        let request = new PaymentRequest(this._paymentTypesSupported, details, options);
+        let request = new PaymentRequest([{
+          supportedMethods: 'https://google.com/pay',
+          data: this.payWithGoogle
+        }], details, options);
 
-        // Handle changing shipping options
-        request.addEventListener('shippingoptionchange', e => {
-          e.updateWith(new Promise(resolve => {
-            this._updateShippingOptions(details, request.shippingOption, resolve);
-          }));
+        // If Pay with Google is available
+        return request.canMakePayment().then(result => {
+          if (result) {
+            return request.show();
+          } else {
+            request = new PaymentRequest(this._paymentTypesSupported, details, options);
+            return request.show();
+          }
         });
-
-        // Handle selecting/changing the shipping address
-        request.addEventListener('shippingaddresschange', e => {
-          e.updateWith(new Promise(resolve => {
-            this._updateShippingAddress(details, request.shippingAddress, resolve);
-          }));
-        });
-
-        return request.show()
       }
 
       _updateShippingAddress(details, addr, resolve) {
@@ -214,11 +205,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           });
         }
 
-        if (supportedMethods.length > 0) {
-          paymentTypes.push({
-            supportedMethods: supportedMethods
-          });
-        }
+        // if (supportedMethods.length > 0) {
+        //   paymentTypes.push({
+        //     supportedMethods: supportedMethods
+        //   });
+        // }
 
         if (payWithGoogle && payWithGoogle != {}) {
           paymentTypes.push({
